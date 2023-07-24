@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { ref, type Ref, computed } from 'vue';
-
-type TodoItem = {
-  content: string,
-  completed: boolean
-}
+import TodoListItem from './components/TodoListItem.vue';
 
 // App State
 const todoItems: Ref<TodoItem[]> = ref([
@@ -68,16 +64,9 @@ const visibleTodoItems = computed(() => viewAllTasks.value ? todoItems.value : t
       </div>
     </div>
     <ul class="todo-list">
-      <li v-for="(item, index) in visibleTodoItems" 
-          :key="item.content" :class="['todo-item', {'todo-item-completed': item.completed}]">
-        <span class="todo-item-content">{{ item.content }}</span>
-        <div>
-          <span v-if="item.completed" @click="clearItem(index)" class="todo-item-clear-button">
-            <font-awesome-icon :icon="['far', 'trash-can']" />
-          </span>
-          <input @click="completeItemToggle(index)"  type="checkbox" class="todo-item-complete-checkbox">
-        </div>
-      </li>
+      <TodoListItem v-for="(item, index) in visibleTodoItems" :key="item.content" 
+         @clear-item="clearItem" @complete-item-toggle="completeItemToggle" :item="item" :index="index"
+      />
     </ul>
     <form action="" class="add-item">
       <input v-model="newItem" class="add-item-input" data-test="new-todo">
@@ -136,22 +125,7 @@ h1 {
   display: flex;
   flex-direction: column;
 }
-.todo-item {
-  list-style: none;
-  padding: 10px;
-  margin: 10px;
-  border: 1px solid white;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-}
-.todo-item-complete-checkbox {
-    margin-left: 16px;
-  }
-.todo-item-completed {
-  text-decoration: line-through;
-  order: 1;
-}
+
 .add-item {
   width: 80%;
   display: flex;
