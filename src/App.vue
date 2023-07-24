@@ -1,27 +1,39 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { ref } from 'vue';
+
+const todoItems = ref(['Pay electric bill', 'Walk the dog']);
+const newItem = ref("");
+function submit (event: Event) {
+  event.preventDefault();
+  todoItems.value.push(newItem.value);
+  newItem.value="";
+}
+
+function remove(index: number) {
+  if(index>=0 && index < todoItems.value.length) { 
+    todoItems.value.splice(index, 1);
+  }
+}
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <div>
+    <h1>To-Do List</h1>
+    <ul class="todo-list">
+      <li v-for="(item, index) in todoItems" :key="item">
+        {{ item }}
+        <button @click="remove(index)">Remove</button> 
+      </li>
+    </ul>
+    <form action="">
+      <input v-model="newItem">
+      <button @click="submit">Add Item</button>
+    </form>
+  </div>
 </template>
 
 <style scoped>
-header {
+/* header {
   line-height: 1.5;
   max-height: 100vh;
 }
@@ -81,5 +93,5 @@ nav a:first-of-type {
     padding: 1rem 0;
     margin-top: 1rem;
   }
-}
+} */
 </style>
