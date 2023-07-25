@@ -15,7 +15,6 @@ import { faSquare, faTrashCan } from '@fortawesome/free-regular-svg-icons'
 /* add icons to the library */
 library.add(faSquare, faTrashCan)
 
-const app = createApp(App)
-.component('font-awesome-icon', FontAwesomeIcon)
+const app = createApp(App).component('font-awesome-icon', FontAwesomeIcon)
 
 app.mount('#app')

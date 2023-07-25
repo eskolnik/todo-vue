@@ -1,30 +1,32 @@
 <script setup lang="ts">
-import { ref, type Ref, onMounted } from 'vue';
-import TodoListItem from './components/TodoListItem.vue';
+import { ref, type Ref, onMounted } from 'vue'
+import TodoListItem from './components/TodoListItem.vue'
 
 // App State
-const todoItems: Ref<TodoItem[]> = ref([]);
-const newItem: Ref<string> = ref("");
-const viewAllTasks: Ref<boolean> = ref(true);
+const todoItems: Ref<TodoItem[]> = ref([])
+const newItem: Ref<string> = ref('')
+const viewAllTasks: Ref<boolean> = ref(true)
 
-const LOCALSTORAGE_KEY_PREFIX = "TODO-LIST-VUE:";
-function localKey(key: string) { return LOCALSTORAGE_KEY_PREFIX + key }
+const LOCALSTORAGE_KEY_PREFIX = 'TODO-LIST-VUE:'
+function localKey(key: string) {
+  return LOCALSTORAGE_KEY_PREFIX + key
+}
 
 // save state to localStorate
 function persist() {
-  localStorage.setItem(localKey("TodoItems"), JSON.stringify(todoItems.value));
+  localStorage.setItem(localKey('TodoItems'), JSON.stringify(todoItems.value))
 }
 
 function hydrate() {
-  const localItems = localStorage.getItem(localKey("TodoItems"));
+  const localItems = localStorage.getItem(localKey('TodoItems'))
 
-  if(localItems) {
-    todoItems.value = JSON.parse(localItems);
+  if (localItems) {
+    todoItems.value = JSON.parse(localItems)
   } else {
     //use default initial state
-    todoItems.value=[
+    todoItems.value = [
       { content: 'Pay electric bill', completed: false },
-      { content: 'Walk the dog', completed: false } 
+      { content: 'Walk the dog', completed: false }
     ]
   }
 }
@@ -33,47 +35,46 @@ function hydrate() {
 onMounted(hydrate)
 
 function viewAll() {
-  viewAllTasks.value = true;
+  viewAllTasks.value = true
 }
 
 function viewActive() {
-  viewAllTasks.value = false;
+  viewAllTasks.value = false
 }
 
 function addItem(event: Event) {
-  event.preventDefault();
-  if(newItem.value.length <= 0) {
-    return;
+  event.preventDefault()
+  if (newItem.value.length <= 0) {
+    return
   }
-  todoItems.value.push({ content: newItem.value, completed: false});
-  newItem.value="";
-  persist();
+  todoItems.value.push({ content: newItem.value, completed: false })
+  newItem.value = ''
+  persist()
 }
 
 function completeItemToggle(index: number) {
-  if(index>=0 && index < todoItems.value.length) { 
-    const todoItem = todoItems.value[index];
-    todoItem.completed = !todoItem.completed;
+  if (index >= 0 && index < todoItems.value.length) {
+    const todoItem = todoItems.value[index]
+    todoItem.completed = !todoItem.completed
   }
-  console.log(todoItems.value);
-  persist();
+  console.log(todoItems.value)
+  persist()
 }
 
 function clearItem(index: number) {
-  if(index>=0 && index < todoItems.value.length) { 
-    const todoItem = todoItems.value[index];
-    if(todoItem.completed) {
-      todoItems.value.splice(index, 1);
+  if (index >= 0 && index < todoItems.value.length) {
+    const todoItem = todoItems.value[index]
+    if (todoItem.completed) {
+      todoItems.value.splice(index, 1)
     }
   }
-  persist();
+  persist()
 }
 
 function clearAllCompleted() {
-  todoItems.value = todoItems.value.filter(item => !item.completed);
-  persist();
+  todoItems.value = todoItems.value.filter((item) => !item.completed)
+  persist()
 }
-
 </script>
 
 <template>
@@ -81,33 +82,51 @@ function clearAllCompleted() {
     <div class="header">
       <h1>To-Do List</h1>
       <div class="controls">
-        <button @click="viewAll" class="view-control" :class="{'view-control-active': viewAllTasks}">All</button>
-        <button @click="viewActive" class="view-control" :class="{'view-control-active': !viewAllTasks}">Active</button>
-        <button @click="clearAllCompleted" class="clear-all-completed" :disabled="todoItems.every(item => !item.completed)">
+        <button
+          @click="viewAll"
+          class="view-control"
+          :class="{ 'view-control-active': viewAllTasks }"
+        >
+          All
+        </button>
+        <button
+          @click="viewActive"
+          class="view-control"
+          :class="{ 'view-control-active': !viewAllTasks }"
+        >
+          Active
+        </button>
+        <button
+          @click="clearAllCompleted"
+          class="clear-all-completed"
+          :disabled="todoItems.every((item) => !item.completed)"
+        >
           Clear Completed
         </button>
       </div>
     </div>
-    <ul class="todo-list" :class="{'hide-completed': !viewAllTasks}">
-      <TodoListItem v-for="(item, index) in todoItems" :key="item.content" 
-         @clear-item="clearItem" 
-         @complete-item-toggle="completeItemToggle" 
-         :item="item" 
-         :index="index"
-         :viewAll="viewAllTasks"
+    <ul class="todo-list" :class="{ 'hide-completed': !viewAllTasks }">
+      <TodoListItem
+        v-for="(item, index) in todoItems"
+        :key="item.content"
+        @clear-item="clearItem"
+        @complete-item-toggle="completeItemToggle"
+        :item="item"
+        :index="index"
+        :viewAll="viewAllTasks"
       />
     </ul>
     <form action="" class="add-item">
-      <input v-model="newItem" class="add-item-input" data-test="new-todo">
+      <input v-model="newItem" class="add-item-input" data-test="new-todo" />
       <button @click="addItem" class="add-item-submit">Add Item</button>
     </form>
   </div>
 </template>
 
 <style>
-  .hide-completed > .todo-item-completed {
-    display:none;
-  } 
+.hide-completed > .todo-item-completed {
+  display: none;
+}
 </style>
 
 <style scoped>
@@ -175,5 +194,4 @@ h1 {
   margin: 10px;
   width: 100px;
 }
-
 </style>
