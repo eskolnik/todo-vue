@@ -12,7 +12,7 @@ defineProps<{
             <span v-if="item.completed" @click="$emit('clearItem', index)" class="todo-item-clear-button">
             <font-awesome-icon :icon="['far', 'trash-can']" />
             </span>
-            <input @click="$emit('completeItemToggle', index)" type="checkbox" class="todo-item-complete-checkbox">
+            <input @click="$emit('completeItemToggle', index)" type="checkbox" class="todo-item-complete-checkbox" :checked="item.completed">
         </div>
     </li>
 </template>

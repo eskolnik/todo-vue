@@ -1,14 +1,36 @@
 <script setup lang="ts">
-import { ref, type Ref, computed } from 'vue';
+import { ref, type Ref, onMounted } from 'vue';
 import TodoListItem from './components/TodoListItem.vue';
 
 // App State
-const todoItems: Ref<TodoItem[]> = ref([
-  { content: 'Pay electric bill', completed: false },
-  { content: 'Walk the dog', completed: false } 
-]);
+const todoItems: Ref<TodoItem[]> = ref([]);
 const newItem: Ref<string> = ref("");
 const viewAllTasks: Ref<boolean> = ref(true);
+
+const LOCALSTORAGE_KEY_PREFIX = "TODO-LIST-VUE:";
+function localKey(key: string) { return LOCALSTORAGE_KEY_PREFIX + key }
+
+// save state to localStorate
+function persist() {
+  localStorage.setItem(localKey("TodoItems"), JSON.stringify(todoItems.value));
+}
+
+function hydrate() {
+  const localItems = localStorage.getItem(localKey("TodoItems"));
+
+  if(localItems) {
+    todoItems.value = JSON.parse(localItems);
+  } else {
+    //use default initial state
+    todoItems.value=[
+      { content: 'Pay electric bill', completed: false },
+      { content: 'Walk the dog', completed: false } 
+    ]
+  }
+}
+
+// fetch state from localStorage on component mount
+onMounted(hydrate)
 
 function viewAll() {
   viewAllTasks.value = true;
@@ -25,6 +47,7 @@ function addItem(event: Event) {
   }
   todoItems.value.push({ content: newItem.value, completed: false});
   newItem.value="";
+  persist();
 }
 
 function completeItemToggle(index: number) {
@@ -32,6 +55,8 @@ function completeItemToggle(index: number) {
     const todoItem = todoItems.value[index];
     todoItem.completed = !todoItem.completed;
   }
+  console.log(todoItems.value);
+  persist();
 }
 
 function clearItem(index: number) {
@@ -41,13 +66,13 @@ function clearItem(index: number) {
       todoItems.value.splice(index, 1);
     }
   }
+  persist();
 }
 
 function clearAllCompleted() {
   todoItems.value = todoItems.value.filter(item => !item.completed);
+  persist();
 }
-
-const visibleTodoItems = computed(() => viewAllTasks.value ? todoItems.value : todoItems.value.filter(item => !item.completed));
 
 </script>
 
@@ -63,9 +88,13 @@ const visibleTodoItems = computed(() => viewAllTasks.value ? todoItems.value : t
         </button>
       </div>
     </div>
-    <ul class="todo-list">
-      <TodoListItem v-for="(item, index) in visibleTodoItems" :key="item.content" 
-         @clear-item="clearItem" @complete-item-toggle="completeItemToggle" :item="item" :index="index"
+    <ul class="todo-list" :class="{'hide-completed': !viewAllTasks}">
+      <TodoListItem v-for="(item, index) in todoItems" :key="item.content" 
+         @clear-item="clearItem" 
+         @complete-item-toggle="completeItemToggle" 
+         :item="item" 
+         :index="index"
+         :viewAll="viewAllTasks"
       />
     </ul>
     <form action="" class="add-item">
@@ -74,6 +103,12 @@ const visibleTodoItems = computed(() => viewAllTasks.value ? todoItems.value : t
     </form>
   </div>
 </template>
+
+<style>
+  .hide-completed > .todo-item-completed {
+    display:none;
+  } 
+</style>
 
 <style scoped>
 .todo-app {
@@ -97,7 +132,6 @@ const visibleTodoItems = computed(() => viewAllTasks.value ? todoItems.value : t
   justify-content: center;
   align-items: center;
 }
-
 h1 {
   margin-bottom: 20px;
 }
@@ -125,7 +159,6 @@ h1 {
   display: flex;
   flex-direction: column;
 }
-
 .add-item {
   width: 80%;
   display: flex;
