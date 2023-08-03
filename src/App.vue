@@ -8,17 +8,17 @@ const newItem: Ref<string> = ref('')
 const viewAllTasks: Ref<boolean> = ref(true)
 
 const LOCALSTORAGE_KEY_PREFIX = 'TODO-LIST-VUE:'
-function localStorageKey(key: string): string {
+function localKey(key: string) {
   return LOCALSTORAGE_KEY_PREFIX + key
 }
 
 // save state to localStorate
 function persist() {
-  localStorage.setItem(localStorageKey('TodoItems'), JSON.stringify(todoItems.value))
+  localStorage.setItem(localKey('TodoItems'), JSON.stringify(todoItems.value))
 }
 
 function hydrate() {
-  const localItems = localStorage.getItem(localStorageKey('TodoItems'))
+  const localItems = localStorage.getItem(localKey('TodoItems'))
 
   if (localItems) {
     todoItems.value = JSON.parse(localItems)
